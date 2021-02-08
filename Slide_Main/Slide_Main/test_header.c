@@ -885,9 +885,9 @@ void EndBlowerTimeSelected(uint8_t EndBlower_Add)
 	}
 }
 
-void my_delay_us(int ms)
+void my_delay_us(float us)
 {
-	while (0 < ms--)
+	while (0 < us--)
 	{
 		_delay_us(1);
 	}

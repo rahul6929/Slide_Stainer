@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 
-
+unsigned char tempbuffer[PACKET_SIZE];
 char buffer[PACKET_SIZE];
 char rec_bufferglob[PACKET_SIZE];									// global buffer to store rec data		15 to 20
 volatile uint8_t myindex =0;										// index for rec_bufferglob
@@ -33,7 +33,7 @@ uint8_t flag = 0;
 int main(void)
 {
 	//uint8_t OneTimeRunFunFlag=0;
-	uint16_t i = 0;
+	
 	float stepdelay;
 	USART2_Init(MYUBRR);
 	USART0_Init(MYUBRR);
@@ -44,31 +44,29 @@ int main(void)
 		EEPROM_DisplayDataInit();
 	_delay_ms(2000);
 	GPIO_WriteToPin(&Motor_Dir, LOW	);
-	stepdelay = 100;
+	uint32_t count;
 	while(1)
-	{
-		for (i=0; i<6400*5; i++)
+	{	
+		
+		stepdelay = 400;
+		for (count=0; count<(96000); count++)
 		{
 			GPIO_WriteToPin(&Motor_Steps, HIGH);
 			my_delay_us(stepdelay);
 			GPIO_WriteToPin(&Motor_Steps, LOW);
 			my_delay_us(stepdelay);
-		}
+			
+			if (count<(32000))
+				stepdelay -= 0.011;
+			if (count>(64000))
+				stepdelay += 0.011;
+			
+			
+		} 
+		USART2_transmitstring("count = ");
+		ltoa(count, buffer, 10);
+		USART2_transmitstring(buffer);
 		_delay_ms(2000);
-		/*
-		for (i=0; i<10000; i++)
-		{
-			GPIO_WriteToPin(&Motor_Steps, HIGH);
-			my_delay_us(stepdelay);
-			GPIO_WriteToPin(&Motor_Steps, LOW);
-			my_delay_us(stepdelay);
-			if(i<1000)
-				stepdelay = stepdelay - 3 ;
-			if (i > 9000)
-				stepdelay = stepdelay + 3 ;
-		}  
-		_delay_ms(1000);
-		*/
 	} 
     /* Replace with your application code */
 	sei();		// To enable Global Interrupt, cli(); for disable

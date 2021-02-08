@@ -202,7 +202,7 @@ void StartBlowerTimeSelected(uint8_t startBlower_Add);
 
 void EndBlowerTimeSelected(uint8_t EndBlower_Add);
 
-void my_delay_us(int ms);
+void my_delay_us(float us);
 
 // ___________________________________ variable declarations _______________________________________
 
