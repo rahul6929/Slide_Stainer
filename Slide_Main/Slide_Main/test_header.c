@@ -45,15 +45,49 @@ void GpioPinInit(void)
 	Motor_Dir.PinNumber = 0;
 	Motor_Dir.PORT = &PORTG;
 	
-	
 	Motor_Steps.INorOUT = OUTPUT;
 	Motor_Steps.PinNumber = 0;
 	Motor_Steps.PORT = &PORTC;
+	
+	Reagent_A_pump.INorOUT = OUTPUT;
+	Reagent_A_pump.PinNumber = 6;
+	Reagent_A_pump.PORT = &PORTB;
+	
+	Reagent_B_pump.INorOUT = OUTPUT;
+	Reagent_B_pump.PinNumber = 5;
+	Reagent_B_pump.PORT = &PORTB;
+	
+	Reagent_C_pump.INorOUT = OUTPUT;
+	Reagent_C_pump.PinNumber = 4;
+	Reagent_C_pump.PORT = &PORTB;
+	
+	Reagent_D_pump.INorOUT = OUTPUT;
+	Reagent_D_pump.PinNumber = 5;
+	Reagent_D_pump.PORT = &PORTH;
+	
+	Reagent_E_pump.INorOUT = OUTPUT;
+	Reagent_E_pump.PinNumber = 4;
+	Reagent_E_pump.PORT = &PORTH;
+	
+	Drain_pump.INorOUT = OUTPUT;
+	Drain_pump.PinNumber = 3;
+	Drain_pump.PORT = &PORTH;
+	
+	Pinch_nozzle.INorOUT = OUTPUT;
+	Pinch_nozzle.PinNumber = 7;
+	Pinch_nozzle.PORT = &PORTD;
 	
 	GPIO_Init(&Rx2Pin);
 	GPIO_Init(&Tx2Pin);
 	GPIO_Init(&Motor_Dir);
 	GPIO_Init(&Motor_Steps);
+	GPIO_Init(&Reagent_A_pump);
+	GPIO_Init(&Reagent_B_pump);
+	GPIO_Init(&Reagent_C_pump);
+	GPIO_Init(&Reagent_D_pump);
+	GPIO_Init(&Reagent_E_pump);
+	GPIO_Init(&Drain_pump);
+	
 	
 }
 
@@ -701,43 +735,7 @@ void EEPROM_DisplayDataInit(void)
 			EEPROM_Write2Bytes(Address, DataInitValue);
 		Address += 2;
 	}
-	/*
-	if (EEPROM_Read2Bytes(P1_REG_A_START_BLOWER_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_A_START_BLOWER_TIME_ADD, RESET);
 	
-	if (EEPROM_Read2Bytes(P1_REG_A_END_BLOWER_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_A_END_BLOWER_TIME_ADD, RESET);
-		
-	if (EEPROM_Read2Bytes(P1_REG_A_QTY_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_A_QTY_ADD, RESET);
-		
-	if (EEPROM_Read2Bytes(P1_REG_A_WAIT_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_A_WAIT_TIME_ADD, RESET);
-		
-	if (EEPROM_Read2Bytes(P1_REG_B_QTY_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_B_QTY_ADD, RESET);
-		
-	if (EEPROM_Read2Bytes(P1_REG_B_WAIT_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_B_WAIT_TIME_ADD, RESET);
-	
-	if (EEPROM_Read2Bytes(P1_REG_C_QTY_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_C_QTY_ADD, RESET);
-	
-	if (EEPROM_Read2Bytes(P1_REG_C_WAIT_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_C_WAIT_TIME_ADD, RESET);
-	
-	if (EEPROM_Read2Bytes(P1_REG_D_QTY_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_D_QTY_ADD, RESET);
-	
-	if (EEPROM_Read2Bytes(P1_REG_D_WAIT_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_D_WAIT_TIME_ADD, RESET);
-		
-	if (EEPROM_Read2Bytes(P1_REG_E_QTY_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_E_QTY_ADD, RESET);
-	
-	if (EEPROM_Read2Bytes(P1_REG_E_WAIT_TIME_ADD)==0xFFFF)
-		EEPROM_Write2Bytes(P1_REG_E_WAIT_TIME_ADD, RESET);
-		*/
 }
 
 void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
@@ -885,7 +883,43 @@ void EndBlowerTimeSelected(uint8_t EndBlower_Add)
 	}
 }
 
-void my_delay_us(float us)
+
+void SpinTimeSelected(uint8_t spin_time_Add)
+{
+	while(1)
+	{
+		_delay_ms(DELAY_IN_LOOP);
+		if (OneTimeRunFunFlag==0)
+		{
+			USART0_transmitstring("n0.val=");
+			itoa(EEPROM_Read2Bytes(spin_time_Add), buffer, 10);
+			USART0_transmitstring(buffer);
+			Send_FF_to_Display();
+			OneTimeRunFunFlag++;
+		}
+		
+		switch(MatchCommand(rec_bufferglob))
+		{
+			case SPINTIME:
+			{
+				EEPROM_Write2Bytes(spin_time_Add, numberhold);
+				strcpy(rec_bufferglob, "back");
+				break;
+			}
+		}
+		
+		if (MatchCommand(rec_bufferglob)==BACK)
+		{
+			OneTimeRunFunFlag=0;
+			memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
+			break;
+		}
+		
+	}
+}
+
+
+void my_delay_us(int us)
 {
 	while (0 < us--)
 	{

@@ -45,29 +45,29 @@ int main(void)
 	_delay_ms(2000);
 	GPIO_WriteToPin(&Motor_Dir, LOW	);
 	uint32_t count;
+	stepdelay = 30;
+	/*
 	while(1)
 	{	
+		itoa(stepdelay, buffer, 10);
+		USART2_transmitstring("\n");
+		USART2_transmitstring(buffer);
 		
-		stepdelay = 400;
-		for (count=0; count<(96000); count++)
+		for (count=0; count<(STEPS_PER_REVOLUTIONS_32th*6u); count++)
 		{
 			GPIO_WriteToPin(&Motor_Steps, HIGH);
 			my_delay_us(stepdelay);
 			GPIO_WriteToPin(&Motor_Steps, LOW);
 			my_delay_us(stepdelay);
 			
-			if (count<(32000))
-				stepdelay -= 0.011;
-			if (count>(64000))
-				stepdelay += 0.011;
-			
 			
 		} 
-		USART2_transmitstring("count = ");
-		ltoa(count, buffer, 10);
-		USART2_transmitstring(buffer);
-		_delay_ms(2000);
-	} 
+		if ((count % STEPS_PER_REVOLUTIONS_32th)==0)
+			stepdelay -= 2 ;
+		
+		
+		//_delay_ms(2000);
+	} */
     /* Replace with your application code */
 	sei();		// To enable Global Interrupt, cli(); for disable
     while (1) 
@@ -416,7 +416,19 @@ int main(void)
 							}
 						}
 						break;
+					  }
+					  
+			case SERVICE:
+				{
+					while(1)
+					{
+						_delay_ms(DELAY_IN_LOOP);
+						_delay_ms(1000);
+						SpinTimeSelected(SPIN_TIME_ADD);
+						break;
 					}
+					break;
+				}
 					
 		}
 		

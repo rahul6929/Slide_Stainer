@@ -20,55 +20,55 @@
 #define MYUBRR F_CPU/16/BAUD-1							// calculating baud rate
 #define F_CPU 16000000UL
 
-#define PACKET_SIZE					20					// 
+#define PACKET_SIZE									20					// 
 
 
 
 ////////////////////// General Macros //////////////////////
-#define INPUT							0
-#define OUTPUT							1
-#define HIGH							1
-#define LOW								0
-#define SET								1
-#define RESET							0
-#define LED_ON							1
-#define LED_OFF							0
-#define ENABLE							1
-#define	DISABLE							0
+#define INPUT										0
+#define OUTPUT										1
+#define HIGH										1
+#define LOW											0
+#define SET											1
+#define RESET										0
+#define LED_ON										1
+#define LED_OFF										0
+#define ENABLE										1
+#define	DISABLE										0
 
 
 // These macros representing the string sending by Nextion display when Touch/Release event happans 
-#define PROGRAM_1						1		
-#define PROGRAM_2						2
-#define PROGRAM_3						3
-#define PROGRAM_4						4
-#define P1EDIT							5
-#define START							6
-#define REG_START_BLO_TIME				7						
-#define REGAQTY							8
-#define REGABT							9
-#define REGENBT							10
-#define REG_END_BLO_TIME				11
-#define REGA							12
-#define REGAWTYM						13
-#define REGB							14
-#define REGC							15
-#define REGD							16
-#define REGE							17
-#define SERVICE							18
-#define SPINTIME						19
-#define BACK							100
-#define DELAY_IN_LOOP					100
+#define PROGRAM_1									1		
+#define PROGRAM_2									2
+#define PROGRAM_3									3
+#define PROGRAM_4									4
+#define P1EDIT										5
+#define START										6
+#define REG_START_BLO_TIME							7						
+#define REGAQTY										8
+#define REGABT										9
+#define REGENBT										10
+#define REG_END_BLO_TIME							11
+#define REGA										12
+#define REGAWTYM									13
+#define REGB										14
+#define REGC										15
+#define REGD										16
+#define REGE										17
+#define SERVICE										18
+#define SPINTIME									19
+#define BACK										100
+#define DELAY_IN_LOOP								100
 
-#define TIME							60				// Seconds
-
+#define TIME										60				// Seconds
+#define STEPS_PER_REVOLUTIONS_32th					6400U			// 1/32th micro stepping
 
 /* EEprom Addresses of parameter*/
 
-#define REG_A_QTY								0x15
-#define REG_A_SPIN_TIME							0x25
+#define REG_A_QTY									0x15
+#define REG_A_SPIN_TIME								0x25
 
-#define DataInitValue							0
+#define DataInitValue								0
 
 
 /* Data Addresses for program 1 */
@@ -202,7 +202,9 @@ void StartBlowerTimeSelected(uint8_t startBlower_Add);
 
 void EndBlowerTimeSelected(uint8_t EndBlower_Add);
 
-void my_delay_us(float us);
+void SpinTimeSelected(uint8_t spin_time_Add);
+
+void my_delay_us(int us);
 
 // ___________________________________ variable declarations _______________________________________
 
@@ -211,5 +213,14 @@ GPIO_Config Rx2Pin;
 
 GPIO_Config Motor_Dir;
 GPIO_Config Motor_Steps;
+
+GPIO_Config Reagent_A_pump;
+GPIO_Config Reagent_B_pump;
+GPIO_Config Reagent_C_pump;
+GPIO_Config Reagent_D_pump;
+GPIO_Config Reagent_E_pump;
+GPIO_Config Drain_pump;
+GPIO_Config Pinch_nozzle;
+
 
 #endif /* TEST_HEADER_H_ */
