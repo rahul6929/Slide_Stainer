@@ -77,6 +77,10 @@ void GpioPinInit(void)
 	Pinch_nozzle.PinNumber = 7;
 	Pinch_nozzle.PORT = &PORTD;
 	
+	Blower.INorOUT = OUTPUT;
+	Blower.PinNumber = 3;
+	Blower.PORT = &PORTL;
+	
 	GPIO_Init(&Rx2Pin);
 	GPIO_Init(&Tx2Pin);
 	GPIO_Init(&Motor_Dir);
@@ -87,7 +91,8 @@ void GpioPinInit(void)
 	GPIO_Init(&Reagent_D_pump);
 	GPIO_Init(&Reagent_E_pump);
 	GPIO_Init(&Drain_pump);
-	
+	GPIO_Init(&Pinch_nozzle);
+	GPIO_Init(&Blower);
 	
 }
 
@@ -925,4 +930,89 @@ void my_delay_us(int us)
 	{
 		_delay_us(1);
 	}
+}
+
+
+// This function will increase speed of motor gradually for 2.5 seconds
+void Increase_gradually_motor(void)
+{
+	uint8_t i = 0;
+	
+	// 2 revolutions with 30us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*2; i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(30);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(30);
+	}
+	
+	// 2 revolutions with 15us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*2; i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(15);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(15);
+	}
+	
+	// 10 revolutions with 10us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*10; i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(10);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(10);
+	}
+	
+}
+
+// This function will decrease speed of motor gradually for 2.5 seconds
+void Decrease_gradually_motor(void)
+{
+	uint8_t i = 0;
+	
+	// 10 revolutions with 10us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*10; i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(10);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(10);
+	}
+	
+	// 2 revolutions with 15us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*2; i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(15);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(15);
+	}
+	
+	// 2 revolutions with 30us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*2; i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(30);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(30);
+	}
+	
+}
+
+void Spin_motor(uint8_t time_in_sec)
+{
+	uint8_t i = 0;
+	Increase_gradually_motor();
+	
+	// in for loop 39 is number of revolutions in 5 sec at 10us delay
+	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*39u*(time_in_sec/5 - 1); i++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(10);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(10);
+	}
+	Decrease_gradually_motor();
 }

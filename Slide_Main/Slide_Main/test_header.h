@@ -206,6 +206,12 @@ void SpinTimeSelected(uint8_t spin_time_Add);
 
 void my_delay_us(int us);
 
+void Increase_gradually_motor(void);
+
+void Decrease_gradually_motor(void);
+
+void Spin_motor(uint8_t time_in_sec);
+
 // ___________________________________ variable declarations _______________________________________
 
 GPIO_Config Tx2Pin;
@@ -221,6 +227,7 @@ GPIO_Config Reagent_D_pump;
 GPIO_Config Reagent_E_pump;
 GPIO_Config Drain_pump;
 GPIO_Config Pinch_nozzle;
+GPIO_Config Blower;
 
 
 #endif /* TEST_HEADER_H_ */

@@ -46,6 +46,7 @@ int main(void)
 	GPIO_WriteToPin(&Motor_Dir, LOW	);
 	uint32_t count;
 	stepdelay = 30;
+
 	/*
 	while(1)
 	{	
@@ -423,7 +424,6 @@ int main(void)
 					while(1)
 					{
 						_delay_ms(DELAY_IN_LOOP);
-						_delay_ms(1000);
 						SpinTimeSelected(SPIN_TIME_ADD);
 						break;
 					}
