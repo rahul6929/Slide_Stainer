@@ -20,7 +20,7 @@
 #define MYUBRR F_CPU/16/BAUD-1							// calculating baud rate
 #define F_CPU 16000000UL
 
-#define PACKET_SIZE									20					// 
+#define PACKET_SIZE									50					// 
 
 
 
@@ -61,7 +61,7 @@
 #define DELAY_IN_LOOP								100
 
 #define TIME										60				// Seconds
-#define STEPS_PER_REVOLUTIONS_32th					6400U			// 1/32th micro stepping
+#define STEPS_PER_REVOLUTIONS_32th					6400u			// 1/32th micro stepping
 
 /* EEprom Addresses of parameter*/
 
@@ -211,6 +211,13 @@ void Increase_gradually_motor(void);
 void Decrease_gradually_motor(void);
 
 void Spin_motor(uint8_t time_in_sec);
+
+void Send_Text_On_Screen(const char	*text);
+
+void Blower_ON(uint16_t Blower_time_sec);
+
+void Dispense_Reagent(uint8_t Quantity, GPIO_Config *pPump_Name);
+
 
 // ___________________________________ variable declarations _______________________________________
 

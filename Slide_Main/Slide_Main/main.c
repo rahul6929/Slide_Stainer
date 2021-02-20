@@ -23,60 +23,35 @@ volatile uint8_t myindex =0;										// index for rec_bufferglob
 volatile uint8_t rec_stop=0;										// flag to indicate data has received
 volatile uint8_t rec_start=0;										// flag to indicate data start coming
 char rec_buff[PACKET_SIZE];											// temporary buffer to store receive data			15 to 20
-volatile uint8_t txtime=TIME;										// store seconds, after this interval data will send automatically
-volatile uint8_t txflag=0;											// flag to indicate txtime complete
+//volatile uint8_t txtime=TIME;										// store seconds, after this interval data will send automatically
+//volatile uint8_t txflag=0;											// flag to indicate txtime complete
 volatile numberhold=3;
 uint8_t OneTimeRunFunFlag=0;
 uint8_t flag = 0;	
-					
+volatile uint16_t time_in_seconds=0;					
 								
 int main(void)
 {
 	//uint8_t OneTimeRunFunFlag=0;
 	
+	
 	float stepdelay;
 	USART2_Init(MYUBRR);
 	USART0_Init(MYUBRR);
 	GpioPinInit();
+	//Timer1_init();
 	USART0_transmitstring("page Main");
 	Send_FF_to_Display();
 	if (EEPROM_Read2Bytes(P4_REG_E_WAIT_TIME_ADD)==0xFFFF)
 		EEPROM_DisplayDataInit();
-	_delay_ms(2000);
-	GPIO_WriteToPin(&Motor_Dir, LOW	);
-	uint32_t count;
-	stepdelay = 30;
-
-	/*
-	while(1)
-	{	
-		itoa(stepdelay, buffer, 10);
-		USART2_transmitstring("\n");
-		USART2_transmitstring(buffer);
-		
-		for (count=0; count<(STEPS_PER_REVOLUTIONS_32th*6u); count++)
-		{
-			GPIO_WriteToPin(&Motor_Steps, HIGH);
-			my_delay_us(stepdelay);
-			GPIO_WriteToPin(&Motor_Steps, LOW);
-			my_delay_us(stepdelay);
-			
-			
-		} 
-		if ((count % STEPS_PER_REVOLUTIONS_32th)==0)
-			stepdelay -= 2 ;
-		
-		
-		//_delay_ms(2000);
-	} */
-    /* Replace with your application code */
+	//_delay_ms(2000);
 	sei();		// To enable Global Interrupt, cli(); for disable
     while (1) 
     {	
 		
 		
 		_delay_ms(DELAY_IN_LOOP);
-		USART2_transmitstring("at Home ");
+		//USART2_transmitstring("at Home ");
 		//USART0_transmitstring("Home ");
 		switch(MatchCommand(rec_bufferglob))
 		{
@@ -91,7 +66,27 @@ int main(void)
 							{	
 								case START:
 									{
-										USART2_transmitstring("Start");
+										_delay_ms(100);
+										USART0_transmitstring("page STATUS");
+										Send_FF_to_Display();
+										Send_Text_On_Screen("Program 1 Initiated");
+										_delay_ms(1500);
+										Send_Text_On_Screen("Drying Cycle In Progress...");
+										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_START_BLOWER_TIME_ADD));
+										Send_Text_On_Screen("Cycle 1 In Progress...");
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_A_QTY_ADD), &Reagent_A_pump);
+										Send_Text_On_Screen("Cycle 2 In Progress...");
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_B_QTY_ADD), &Reagent_A_pump);
+										Send_Text_On_Screen("Cycle 3 In Progress...");
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_C_QTY_ADD), &Reagent_A_pump);
+										Send_Text_On_Screen("Cycle 4 In Progress...");
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_D_QTY_ADD), &Reagent_A_pump);
+										Send_Text_On_Screen("Cycle 5 In Progress...");
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_E_QTY_ADD), &Reagent_A_pump);
+										Send_Text_On_Screen("Drying Cycle In Progress...");
+										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_END_BLOWER_TIME_ADD));
+										
+										memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
 										break;
 									}
 								case P1EDIT:
@@ -513,9 +508,11 @@ ISR(USART0_RX_vect)
 
 
 ///////////////////////////////////---- ISR for TIMER1_OVF_vect -----////////////////////////////////////////
+/*
 ISR(TIMER1_OVF_vect)
 {
-	
+	time_in_seconds++;
+	USART2_Transmit(time_in_seconds);
 	txtime--;
 	if (txtime == 0)
 	{
@@ -524,6 +521,17 @@ ISR(TIMER1_OVF_vect)
 		TCCR1B = (5<<0);	// prescalar 1024
 	}
 	//USART2_transmitstring("int ");
+	TCNT1 =0xC2F7;	// This value will generate 1 Sec delay for prescaler 1024 and 16 mhz crystel
+	TCCR1B = (5<<0);	// prescaler 1024
+	
+}
+*/
+ISR(TIMER1_OVF_vect)
+{
+	time_in_seconds++;
+// 	itoa(time_in_seconds, buffer, 10);
+// 	USART2_transmitstring("n0= ");
+// 	USART2_transmitstring(buffer);
 	TCNT1 =0xC2F7;	// This value will generate 1 Sec delay for prescaler 1024 and 16 mhz crystel
 	TCCR1B = (5<<0);	// prescaler 1024
 	

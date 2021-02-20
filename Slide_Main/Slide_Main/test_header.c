@@ -17,6 +17,7 @@ extern char buffer[];
 extern uint16_t numberhold;
 extern uint8_t OneTimeRunFunFlag;
 extern uint8_t flag ;
+extern uint16_t time_in_seconds;
 
 /*************************************************************************************************************************************
 
@@ -725,8 +726,8 @@ void Send_FF_to_Display()
 	uint8_t i=0;
 	for(i=0; i<3; i++)
 		USART0_Transmit(0xFF);
-	//USART0_Transmit(0xFF);
-	//USART0_Transmit(0xFF);
+
+	memset(buffer, '\0', PACKET_SIZE * sizeof(buffer[0]));	// rec_bufferglob clear
 	
 }
 
@@ -936,7 +937,7 @@ void my_delay_us(int us)
 // This function will increase speed of motor gradually for 2.5 seconds
 void Increase_gradually_motor(void)
 {
-	uint8_t i = 0;
+	uint32_t i = 0;
 	
 	// 2 revolutions with 30us delay
 	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*2; i++)
@@ -970,7 +971,7 @@ void Increase_gradually_motor(void)
 // This function will decrease speed of motor gradually for 2.5 seconds
 void Decrease_gradually_motor(void)
 {
-	uint8_t i = 0;
+	uint32_t i = 0;
 	
 	// 10 revolutions with 10us delay
 	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*10; i++)
@@ -1003,16 +1004,49 @@ void Decrease_gradually_motor(void)
 
 void Spin_motor(uint8_t time_in_sec)
 {
-	uint8_t i = 0;
-	Increase_gradually_motor();
 	
-	// in for loop 39 is number of revolutions in 5 sec at 10us delay
-	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*39u*(time_in_sec/5 - 1); i++)
-	{
-		GPIO_WriteToPin(&Motor_Steps, HIGH);
-		_delay_us(10);
-		GPIO_WriteToPin(&Motor_Steps, LOW);
-		_delay_us(10);
+	if(time_in_sec > 0)
+	{	
+		uint32_t i = 0;
+		Increase_gradually_motor();
+		// in for loop 39 is number of revolutions in 5 sec at 10us delay
+		for (i=0; i<STEPS_PER_REVOLUTIONS_32th*39u*(time_in_sec/5 - 1); i++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			_delay_us(10);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			_delay_us(10);
+		}
+		Decrease_gradually_motor();
 	}
-	Decrease_gradually_motor();
+}
+
+void Send_Text_On_Screen(const char	*text)
+{
+	_delay_ms(DELAY_IN_LOOP);
+
+	strcat(buffer, "text.txt=");
+	strcat(buffer, "\"");
+	strcat(buffer, text);
+	strcat(buffer, "\"");
+	USART0_transmitstring(buffer);
+	USART2_transmitstring(buffer);
+	Send_FF_to_Display();
+	memset(buffer, '\0', PACKET_SIZE * sizeof(buffer[0]));	// rec_bufferglob clear
+}
+
+void Blower_ON(uint16_t Blower_time_sec)
+{
+	
+	Timer1_init();
+	while( (Blower_time_sec - time_in_seconds) != 0 )
+		GPIO_WriteToPin(&Blower, HIGH);
+	GPIO_WriteToPin(&Blower, LOW);
+	TIMSK1 &= ~(1<<0);	// Interrupt disable
+	time_in_seconds=0;
+}
+
+void Dispense_Reagent(uint8_t Quantity, GPIO_Config *pPump_Name)
+{
+	
 }
