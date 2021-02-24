@@ -119,10 +119,13 @@ int main(void)
 																				
 										Send_Text_On_Screen("Draining Cycle In Progress...");
 										_delay_ms(1000);
-										Send_Text_On_Screen("End of Program 1, Please remove the slide tray.");
+										Send_Text_On_Screen("End of Program 1, Please \nremove the slide tray.");
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_END_BLOWER_TIME_ADD));
-										
-										memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
+										_delay_ms(2000);
+										USART0_transmitstring("page Main");
+										Send_FF_to_Display();
+										strcpy(rec_bufferglob, "back");
+										//memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
 										break;
 									}
 								case P1EDIT:
@@ -462,59 +465,59 @@ int main(void)
 				}
 				
 			case TESTBENCH:
-			{
-				while(1)
 				{
-					if (!strcmp(rec_bufferglob, "motorA_ON"))
-						GPIO_WriteToPin(&Reagent_A_pump, HIGH);
-					if (!strcmp(rec_bufferglob, "motorA_OFF"))
-						GPIO_WriteToPin(&Reagent_A_pump, LOW);
-						
-					if (!strcmp(rec_bufferglob, "motorB_ON"))
-						GPIO_WriteToPin(&Reagent_B_pump, HIGH);
-					if (!strcmp(rec_bufferglob, "motorB_OFF"))
-						GPIO_WriteToPin(&Reagent_B_pump, LOW);
-						
-					if (!strcmp(rec_bufferglob, "motorC_ON"))
-						GPIO_WriteToPin(&Reagent_C_pump, HIGH);
-					if (!strcmp(rec_bufferglob, "motorC_OFF"))
-						GPIO_WriteToPin(&Reagent_C_pump, LOW);
-						
-					if (!strcmp(rec_bufferglob, "motorD_ON"))
-						GPIO_WriteToPin(&Reagent_D_pump, HIGH);
-					if (!strcmp(rec_bufferglob, "motorD_OFF"))
-						GPIO_WriteToPin(&Reagent_D_pump, LOW);
-						
-					if (!strcmp(rec_bufferglob, "motorE_ON"))
-						GPIO_WriteToPin(&Reagent_E_pump, HIGH);
-					if (!strcmp(rec_bufferglob, "motorE_OFF"))
-						GPIO_WriteToPin(&Reagent_E_pump, LOW);
-					
-					if (!strcmp(rec_bufferglob, "motorDRAIN_ON"))
-						GPIO_WriteToPin(&Drain_pump, HIGH);
-					if (!strcmp(rec_bufferglob, "motorDRAIN_OFF"))
-						GPIO_WriteToPin(&Drain_pump, LOW);
-					
-					if (!strcmp(rec_bufferglob, "FAN_ON"))
-						GPIO_WriteToPin(&Fan, HIGH);
-					if (!strcmp(rec_bufferglob, "FAN_OFF"))
-						GPIO_WriteToPin(&Fan, LOW);
-					
-					if (!strcmp(rec_bufferglob, "BLOWER_ON"))
-						GPIO_WriteToPin(&Blower, HIGH);
-					if (!strcmp(rec_bufferglob, "BLOWER_OFF"))
-						GPIO_WriteToPin(&Blower, LOW);
-					
-					
-					if (MatchCommand(rec_bufferglob)==BACK)
+					while(1)
 					{
-						memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
-						break;
+						if (!strcmp(rec_bufferglob, "motorA_ON"))
+							GPIO_WriteToPin(&Reagent_A_pump, HIGH);
+						if (!strcmp(rec_bufferglob, "motorA_OFF"))
+							GPIO_WriteToPin(&Reagent_A_pump, LOW);
+						
+						if (!strcmp(rec_bufferglob, "motorB_ON"))
+							GPIO_WriteToPin(&Reagent_B_pump, HIGH);
+						if (!strcmp(rec_bufferglob, "motorB_OFF"))
+							GPIO_WriteToPin(&Reagent_B_pump, LOW);
+						
+						if (!strcmp(rec_bufferglob, "motorC_ON"))
+							GPIO_WriteToPin(&Reagent_C_pump, HIGH);
+						if (!strcmp(rec_bufferglob, "motorC_OFF"))
+							GPIO_WriteToPin(&Reagent_C_pump, LOW);
+						
+						if (!strcmp(rec_bufferglob, "motorD_ON"))
+							GPIO_WriteToPin(&Reagent_D_pump, HIGH);
+						if (!strcmp(rec_bufferglob, "motorD_OFF"))
+							GPIO_WriteToPin(&Reagent_D_pump, LOW);
+						
+						if (!strcmp(rec_bufferglob, "motorE_ON"))
+							GPIO_WriteToPin(&Reagent_E_pump, HIGH);
+						if (!strcmp(rec_bufferglob, "motorE_OFF"))
+							GPIO_WriteToPin(&Reagent_E_pump, LOW);
+					
+						if (!strcmp(rec_bufferglob, "motorDRAIN_ON"))
+							GPIO_WriteToPin(&Drain_pump, HIGH);
+						if (!strcmp(rec_bufferglob, "motorDRAIN_OFF"))
+							GPIO_WriteToPin(&Drain_pump, LOW);
+					
+						if (!strcmp(rec_bufferglob, "FAN_ON"))
+							GPIO_WriteToPin(&Fan, HIGH);
+						if (!strcmp(rec_bufferglob, "FAN_OFF"))
+							GPIO_WriteToPin(&Fan, LOW);
+					
+						if (!strcmp(rec_bufferglob, "BLOWER_ON"))
+							GPIO_WriteToPin(&Blower, HIGH);
+						if (!strcmp(rec_bufferglob, "BLOWER_OFF"))
+							GPIO_WriteToPin(&Blower, LOW);
+					
+					
+						if (MatchCommand(rec_bufferglob)==BACK)
+						{
+							memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
+							break;
+						}
+						//memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
 					}
-					//memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
+					break;
 				}
-				break;
-			}
 					
 		}
 		
