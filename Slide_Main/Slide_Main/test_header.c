@@ -580,28 +580,50 @@ void Delay(uint8_t time)
 	for (i=0; i<time; i++)
 	{
 		
-		TCNT1 =0xC2F7;	// This value will generate 1 Sec delay for prescaler 1024 and 16 mhz crystel 
-		TCCR1B = (5<<0);	// prescaler 1024
+		TCNT1 =0xC2F7;				// This value will generate 1 Sec delay for prescaler 1024 and 16 mhz crystel 
+		TCCR1B = (5<<0);			// prescaler 1024
 		while ((TIFR1 & 0x01)==0);	// waiting for timer overflow 
-		TCCR1B=0;			// timer off
-		TCNT1 = 0;			// timer buffer clear
-		TIFR1 |= (1<<0);	// timer overflow bit clear by writing it 1
+		TCCR1B=0;					// timer off
+		TCNT1 = 0;					// timer buffer clear
+		TIFR1 |= (1<<0);			// timer overflow bit clear by writing it 1
 	}
 }
+
+/*************************************************************************************************************************************
+
+Function Name	->		Timer1_init
+
+Return Type		->		void
+
+Parameter 1		->		Void
+
+Remark			->		This function initialize timer 1 for 1 second delay and also enable timer 1 interrupt
+
+*************************************************************************************************************************************/
 
 
 void Timer1_init(void)
 {
-	TCCR1A =0;		// compare output mode is disable for channel A,B and C
-	TCCR1C =0;		// Force Output Compare for Channel A, B and Channel C are disable
-	TCNT1 =0xC2F7;	// This value will generate 1 Sec delay for prescaler 1024 and 16 MHz crystal
-	TCCR1B = (5<<0);	// prescaler 1024, It also enable Timer1
-	TIMSK1 |= (1<<0);	// Interrupt enable
+	TCCR1A =0;					// compare output mode is disable for channel A,B and C
+	TCCR1C =0;					// Force Output Compare for Channel A, B and Channel C are disable
+	TCNT1 =0xC2F7;				// This value will generate 1 Sec delay for prescaler 1024 and 16 MHz crystal
+	TCCR1B = (5<<0);			// prescaler 1024, It also enable Timer1
+	TIMSK1 |= (1<<0);			// Interrupt enable
 	time_in_seconds=0;
 }
 
 
+/*************************************************************************************************************************************
 
+Function Name	->		GPIO_TogglePin
+
+Return Type		->		void
+
+Parameter 1		->		GPIO_Config * (structure address), address of structure variable containing Pin info
+
+Remark			->		This function toggle pin
+
+*************************************************************************************************************************************/
 
 void GPIO_TogglePin( GPIO_Config *pNAME )
 {
@@ -609,10 +631,21 @@ void GPIO_TogglePin( GPIO_Config *pNAME )
 }
 
 
-// This function will return a number based on string sent by nextion display
+/*************************************************************************************************************************************
+
+Function Name	->		MatchCommand
+
+Return Type		->		uint8_t
+
+Parameter 1		->		string
+
+Remark			->		This function return a number based on command recieved by Nextiion display. Basically here we are identifying which button is pressed.
+						So based on command, program jump into respective case. Here we are also storing data in EEPROM with the help of 'numberhold' variable
+
+*************************************************************************************************************************************/
+
 uint8_t MatchCommand(char *command)
 {	
-	
 	
 	//numberhold = 0;
 	unsigned char *token = NULL;
@@ -655,7 +688,7 @@ uint8_t MatchCommand(char *command)
 		return TESTBENCH;
 	
 	
-	/* Here we are getting data to be stored from display */
+	/* Here we are getting data to be stored from display. numberhold is global variable so its used to store different data*/
 	if (!strcmp(token, "REGABT"))
 		{
 			token = strtok(NULL, "|");
@@ -709,24 +742,17 @@ uint8_t MatchCommand(char *command)
 		return 0;
 }
 
-/*
-uint16_t GetValueFromDisplay()
-{
-	uint16_t temp=0;
-	unsigned char *token = NULL;
-	token = strtok(rec_bufferglob, "|");
-	if (!strcmp(token, "REGABT"))
-	{
-		token = strtok(NULL, "|");
-		temp = *(token);
-		temp |= (*(token+1))<<8;
-		return temp;
-	}
-	
-	else
-		return 0;
-}
-*/
+/*************************************************************************************************************************************
+
+Function Name	->		Send_FF_to_Display
+
+Return Type		->		void
+
+Parameter 1		->		void
+
+Remark			->		This function sends 0xFF 0xFF 0xFF to nextion with any command send to Nextion display
+
+*************************************************************************************************************************************/
 
 void Send_FF_to_Display()
 {
@@ -738,6 +764,18 @@ void Send_FF_to_Display()
 	
 }
 
+/*************************************************************************************************************************************
+
+Function Name	->		EEPROM_DisplayDataInit
+
+Return Type		->		void
+
+Parameter 1		->		void
+
+Remark			->		This function Initialize data 0 that need to be stored on EEPROM location 
+
+*************************************************************************************************************************************/
+
 void EEPROM_DisplayDataInit(void)
 {
 	uint8_t i=0;
@@ -746,18 +784,34 @@ void EEPROM_DisplayDataInit(void)
 	{
 		if (EEPROM_Read2Bytes(Address)==0xFFFF)
 			EEPROM_Write2Bytes(Address, DataInitValue);
-		Address += 2;
+		Address += 2;				// Increment by 2 because each data are of 2 bytes
 	}
 	
 }
+
+/*************************************************************************************************************************************
+
+Function Name	->		ReagentSelected
+
+Return Type		->		void
+
+Parameter 1		->		uint8_t, EEPROM Address of reagent quantity to be stored
+
+Parameter 2		->		uint8_t, quantity to be stored
+
+Remark			->		This function is used to display data of specific reagent and stored new data too
+
+*************************************************************************************************************************************/
 
 void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
 {
 	while(1)
 	{
 		_delay_ms(DELAY_IN_LOOP);
-		USART2_transmitstring("qty ");
-		USART2_Transmit(OneTimeRunFunFlag);
+		//USART2_transmitstring("qty ");
+		//USART2_Transmit(OneTimeRunFunFlag);
+		
+		// This part just updates the data on screen that has been stored, So it need to be run one time only
 		if (OneTimeRunFunFlag==0)
 		{
 			USART0_transmitstring("n0.val=");
@@ -771,6 +825,7 @@ void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
 		{
 			case REGAQTY:
 			{
+				// if quantity is saved on nextion display then here we are storing it on specific location
 				EEPROM_Write2Bytes(qty_Add, numberhold);
 				OneTimeRunFunFlag=0;
 				
@@ -778,7 +833,8 @@ void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
 				{
 					_delay_ms(DELAY_IN_LOOP);
 					//USART2_transmitstring("wait ");
-					USART2_Transmit(OneTimeRunFunFlag);
+					//USART2_Transmit(OneTimeRunFunFlag);
+					// This part just updates the data on screen that has been stored, So it need to be run one time only
 					if (OneTimeRunFunFlag==0)
 					{
 						USART0_transmitstring("n0.val=");
@@ -817,6 +873,7 @@ void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
 			}
 		}
 		
+		// If back button is pressed this part will help to get out from while loop
 		if (MatchCommand(rec_bufferglob)==BACK)
 		{
 			OneTimeRunFunFlag=0;
@@ -827,6 +884,18 @@ void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
 		
 	}
 }
+
+/*************************************************************************************************************************************
+
+Function Name	->		StartBlowerTimeSelected
+
+Return Type		->		void
+
+Parameter 1		->		uint8_t, EEPROM Address of start blower time to be stored
+
+Remark			->		This function display start blower time and able to stored new start blower data
+
+*************************************************************************************************************************************/
 
 void StartBlowerTimeSelected(uint8_t startBlower_Add)
 {
@@ -846,7 +915,7 @@ void StartBlowerTimeSelected(uint8_t startBlower_Add)
 		{
 			case REGABT:
 			{
-				EEPROM_Write2Bytes(startBlower_Add, numberhold);
+				EEPROM_Write2Bytes(startBlower_Add, numberhold);		// here numberhold variable contains value of start blower time
 				strcpy(rec_bufferglob, "back");
 				break;
 			}
@@ -862,6 +931,7 @@ void StartBlowerTimeSelected(uint8_t startBlower_Add)
 	}
 }
 
+// This function works same as above
 void EndBlowerTimeSelected(uint8_t EndBlower_Add)
 {
 	while(1)
@@ -896,7 +966,7 @@ void EndBlowerTimeSelected(uint8_t EndBlower_Add)
 	}
 }
 
-
+// This function works same as above, 
 void SpinTimeSelected(uint8_t spin_time_Add)
 {
 	while(1)
@@ -931,6 +1001,18 @@ void SpinTimeSelected(uint8_t spin_time_Add)
 	}
 }
 
+
+/*************************************************************************************************************************************
+
+Function Name	->		my_delay_us
+
+Return Type		->		void
+
+Parameter 1		->		int, delay in microseconds
+
+Remark			->		This function has to be created because in _delay_us() variable delay doesnt works
+
+*************************************************************************************************************************************/
 
 void my_delay_us(int us)
 {

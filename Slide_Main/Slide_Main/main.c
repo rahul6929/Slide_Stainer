@@ -71,8 +71,11 @@ int main(void)
 			GPIO_WriteToPin(&Motor_Steps, LOW);
 			_delay_us(13);
 		}
-		
+		_delay_ms(1500);
 	} */
+	
+/////////////////////////////////////////////////////////  SUPER LOOP START  ////////////////////////////////////////////////////////////////////////////////	
+	
     while (1) 
     {	
 		_delay_ms(DELAY_IN_LOOP);
@@ -96,12 +99,12 @@ int main(void)
 										Send_FF_to_Display();
 										Send_Text_On_Screen("Program 1 Initiated");
 										_delay_ms(1500);
-										
+
 										Send_Text_On_Screen("Drying Cycle In Progress...");
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_START_BLOWER_TIME_ADD));
 										
-										Send_Text_On_Screen("Cycle 1 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_A_QTY_ADD), &Reagent_A_pump);
+										Send_Text_On_Screen("Cycle 1 In Progress...");											
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_A_QTY_ADD), &Reagent_A_pump);				
 										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_A_WAIT_TIME_ADD));
 										//Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));
 										
@@ -111,19 +114,22 @@ int main(void)
 										Send_Text_On_Screen("Cycle 3 In Progress...");
 										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_C_QTY_ADD), &Reagent_C_pump);
 										
+										
 										Send_Text_On_Screen("Cycle 4 In Progress...");
 										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_D_QTY_ADD), &Reagent_D_pump);
 										 										
  										Send_Text_On_Screen("Cycle 5 In Progress...");
  										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_E_QTY_ADD), &Reagent_E_pump); 
-																				
+																			
 										Send_Text_On_Screen("Draining Cycle In Progress...");
 										_delay_ms(1000);
-										Send_Text_On_Screen("End of Program 1, Please \nremove the slide tray.");
+										
+										Send_Text_On_Screen("End of Program 1, remove tray.");
+											
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_END_BLOWER_TIME_ADD));
-										_delay_ms(2000);
+										_delay_ms(2000); 
 										USART0_transmitstring("page Main");
-										Send_FF_to_Display();
+										Send_FF_to_Display(); 
 										strcpy(rec_bufferglob, "back");
 										//memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
 										break;
@@ -466,8 +472,14 @@ int main(void)
 				
 			case TESTBENCH:
 				{
+					GPIO_WriteToPin(&Reagent_D_pump, HIGH);
+					USART2_transmitstring("\ntestbench");
+					memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
 					while(1)
 					{
+						USART2_transmitstring("\nrecbuff = ");
+						USART2_transmitstring(rec_bufferglob);
+						_delay_ms(200);
 						if (!strcmp(rec_bufferglob, "motorA_ON"))
 							GPIO_WriteToPin(&Reagent_A_pump, HIGH);
 						if (!strcmp(rec_bufferglob, "motorA_OFF"))
@@ -522,7 +534,8 @@ int main(void)
 		}
 		
     }
-	
+
+////////////////////////////////////////  SUPER LOOP END  ////////////////////////////////////////////////////////////////////////////	
 	return 0;
 }
 
