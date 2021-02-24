@@ -33,25 +33,50 @@ volatile uint16_t time_in_seconds=0;
 int main(void)
 {
 	//uint8_t OneTimeRunFunFlag=0;
+	uint32_t counting = 0;
 	
 	
 	float stepdelay;
 	USART2_Init(MYUBRR);
 	USART0_Init(MYUBRR);
 	GpioPinInit();
+	_delay_ms(1000);
 	//Timer1_init();
+	USART2_transmitstring("sdjcsdb");
 	USART0_transmitstring("page Main");
 	Send_FF_to_Display();
 	if (EEPROM_Read2Bytes(P4_REG_E_WAIT_TIME_ADD)==0xFFFF)
 		EEPROM_DisplayDataInit();
-	//_delay_ms(2000);
+	GPIO_WriteToPin(&Motor_Dir, HIGH);
+	//TIMSK1 &= ~(1<<0);	// Interrupt disable
+
 	sei();		// To enable Global Interrupt, cli(); for disable
+	/*
+	while(1)
+	{
+		GPIO_WriteToPin(&Motor_Dir, HIGH);
+		for(counting =0; counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*10); counting++)
+		{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		_delay_us(13);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		_delay_us(13);
+		}
+		_delay_ms(1500);
+		GPIO_WriteToPin(&Motor_Dir, LOW);
+		for(counting =0; counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*10); counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			_delay_us(13);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			_delay_us(13);
+		}
+		
+	} */
     while (1) 
     {	
-		
-		
 		_delay_ms(DELAY_IN_LOOP);
-		//USART2_transmitstring("at Home ");
+		//USART2_transmitstring("\nat Home ");
 		//USART0_transmitstring("Home ");
 		switch(MatchCommand(rec_bufferglob))
 		{
@@ -71,19 +96,30 @@ int main(void)
 										Send_FF_to_Display();
 										Send_Text_On_Screen("Program 1 Initiated");
 										_delay_ms(1500);
+										
 										Send_Text_On_Screen("Drying Cycle In Progress...");
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_START_BLOWER_TIME_ADD));
+										
 										Send_Text_On_Screen("Cycle 1 In Progress...");
 										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_A_QTY_ADD), &Reagent_A_pump);
+										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_A_WAIT_TIME_ADD));
+										//Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));
+										
 										Send_Text_On_Screen("Cycle 2 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_B_QTY_ADD), &Reagent_A_pump);
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_B_QTY_ADD), &Reagent_B_pump);
+										
 										Send_Text_On_Screen("Cycle 3 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_C_QTY_ADD), &Reagent_A_pump);
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_C_QTY_ADD), &Reagent_C_pump);
+										
 										Send_Text_On_Screen("Cycle 4 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_D_QTY_ADD), &Reagent_A_pump);
-										Send_Text_On_Screen("Cycle 5 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_E_QTY_ADD), &Reagent_A_pump);
-										Send_Text_On_Screen("Drying Cycle In Progress...");
+										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_D_QTY_ADD), &Reagent_D_pump);
+										 										
+ 										Send_Text_On_Screen("Cycle 5 In Progress...");
+ 										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_E_QTY_ADD), &Reagent_E_pump); 
+																				
+										Send_Text_On_Screen("Draining Cycle In Progress...");
+										_delay_ms(1000);
+										Send_Text_On_Screen("End of Program 1, Please remove the slide tray.");
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_END_BLOWER_TIME_ADD));
 										
 										memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
@@ -161,7 +197,7 @@ int main(void)
 						
 						break;
 					}
-					
+				
 			case PROGRAM_2:
 					{
 						while(1)
@@ -424,6 +460,61 @@ int main(void)
 					}
 					break;
 				}
+				
+			case TESTBENCH:
+			{
+				while(1)
+				{
+					if (!strcmp(rec_bufferglob, "motorA_ON"))
+						GPIO_WriteToPin(&Reagent_A_pump, HIGH);
+					if (!strcmp(rec_bufferglob, "motorA_OFF"))
+						GPIO_WriteToPin(&Reagent_A_pump, LOW);
+						
+					if (!strcmp(rec_bufferglob, "motorB_ON"))
+						GPIO_WriteToPin(&Reagent_B_pump, HIGH);
+					if (!strcmp(rec_bufferglob, "motorB_OFF"))
+						GPIO_WriteToPin(&Reagent_B_pump, LOW);
+						
+					if (!strcmp(rec_bufferglob, "motorC_ON"))
+						GPIO_WriteToPin(&Reagent_C_pump, HIGH);
+					if (!strcmp(rec_bufferglob, "motorC_OFF"))
+						GPIO_WriteToPin(&Reagent_C_pump, LOW);
+						
+					if (!strcmp(rec_bufferglob, "motorD_ON"))
+						GPIO_WriteToPin(&Reagent_D_pump, HIGH);
+					if (!strcmp(rec_bufferglob, "motorD_OFF"))
+						GPIO_WriteToPin(&Reagent_D_pump, LOW);
+						
+					if (!strcmp(rec_bufferglob, "motorE_ON"))
+						GPIO_WriteToPin(&Reagent_E_pump, HIGH);
+					if (!strcmp(rec_bufferglob, "motorE_OFF"))
+						GPIO_WriteToPin(&Reagent_E_pump, LOW);
+					
+					if (!strcmp(rec_bufferglob, "motorDRAIN_ON"))
+						GPIO_WriteToPin(&Drain_pump, HIGH);
+					if (!strcmp(rec_bufferglob, "motorDRAIN_OFF"))
+						GPIO_WriteToPin(&Drain_pump, LOW);
+					
+					if (!strcmp(rec_bufferglob, "FAN_ON"))
+						GPIO_WriteToPin(&Fan, HIGH);
+					if (!strcmp(rec_bufferglob, "FAN_OFF"))
+						GPIO_WriteToPin(&Fan, LOW);
+					
+					if (!strcmp(rec_bufferglob, "BLOWER_ON"))
+						GPIO_WriteToPin(&Blower, HIGH);
+					if (!strcmp(rec_bufferglob, "BLOWER_OFF"))
+						GPIO_WriteToPin(&Blower, LOW);
+					
+					
+					if (MatchCommand(rec_bufferglob)==BACK)
+					{
+						memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
+						break;
+					}
+					//memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
+				}
+				break;
+			}
 					
 		}
 		
@@ -529,9 +620,10 @@ ISR(TIMER1_OVF_vect)
 ISR(TIMER1_OVF_vect)
 {
 	time_in_seconds++;
-// 	itoa(time_in_seconds, buffer, 10);
-// 	USART2_transmitstring("n0= ");
-// 	USART2_transmitstring(buffer);
+	itoa(time_in_seconds, buffer, 10);
+	USART2_transmitstring("\ntime in seconds = ");
+	USART2_transmitstring(buffer);
+	memset(buffer, '\0', PACKET_SIZE * sizeof(buffer[0]));	// rec_bufferglob clear
 	TCNT1 =0xC2F7;	// This value will generate 1 Sec delay for prescaler 1024 and 16 mhz crystel
 	TCCR1B = (5<<0);	// prescaler 1024
 	

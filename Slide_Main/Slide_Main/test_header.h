@@ -57,11 +57,12 @@
 #define REGE										17
 #define SERVICE										18
 #define SPINTIME									19
+#define TESTBENCH									20
 #define BACK										100
 #define DELAY_IN_LOOP								100
 
 #define TIME										60				// Seconds
-#define STEPS_PER_REVOLUTIONS_32th					6400u			// 1/32th micro stepping
+#define STEPS_PER_REVOLUTIONS_32th					6400			// 1/32th micro stepping
 
 /* EEprom Addresses of parameter*/
 
@@ -206,6 +207,8 @@ void SpinTimeSelected(uint8_t spin_time_Add);
 
 void my_delay_us(int us);
 
+void my_delay_ms(uint32_t ms);
+
 void Increase_gradually_motor(void);
 
 void Decrease_gradually_motor(void);
@@ -218,6 +221,9 @@ void Blower_ON(uint16_t Blower_time_sec);
 
 void Dispense_Reagent(uint8_t Quantity, GPIO_Config *pPump_Name);
 
+void my_delay_ms(uint32_t ms);
+
+void Reagent_Wait_Time(uint16_t wait_Time);
 
 // ___________________________________ variable declarations _______________________________________
 
@@ -235,6 +241,6 @@ GPIO_Config Reagent_E_pump;
 GPIO_Config Drain_pump;
 GPIO_Config Pinch_nozzle;
 GPIO_Config Blower;
-
+GPIO_Config Fan;
 
 #endif /* TEST_HEADER_H_ */

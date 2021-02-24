@@ -82,6 +82,10 @@ void GpioPinInit(void)
 	Blower.PinNumber = 3;
 	Blower.PORT = &PORTL;
 	
+	Fan.INorOUT = OUTPUT;
+	Fan.PinNumber = 5;
+	Fan.PORT = &PORTL;
+	
 	GPIO_Init(&Rx2Pin);
 	GPIO_Init(&Tx2Pin);
 	GPIO_Init(&Motor_Dir);
@@ -94,6 +98,7 @@ void GpioPinInit(void)
 	GPIO_Init(&Drain_pump);
 	GPIO_Init(&Pinch_nozzle);
 	GPIO_Init(&Blower);
+	GPIO_Init(&Fan);
 	
 }
 
@@ -590,9 +595,9 @@ void Timer1_init(void)
 	TCCR1A =0;		// compare output mode is disable for channel A,B and C
 	TCCR1C =0;		// Force Output Compare for Channel A, B and Channel C are disable
 	TCNT1 =0xC2F7;	// This value will generate 1 Sec delay for prescaler 1024 and 16 MHz crystal
-	TCCR1B = (5<<0);	// prescaler 1024
+	TCCR1B = (5<<0);	// prescaler 1024, It also enable Timer1
 	TIMSK1 |= (1<<0);	// Interrupt enable
-	
+	time_in_seconds=0;
 }
 
 
@@ -646,6 +651,8 @@ uint8_t MatchCommand(char *command)
 		return REGE;
 	if (!strcmp(command, "service"))
 		return SERVICE;
+	if (!strcmp(command, "testbench"))
+		return TESTBENCH;
 	
 	
 	/* Here we are getting data to be stored from display */
@@ -770,7 +777,7 @@ void ReagentSelected(uint8_t qty_Add, uint8_t wait_Add)
 				while(1)
 				{
 					_delay_ms(DELAY_IN_LOOP);
-					USART2_transmitstring("wait ");
+					//USART2_transmitstring("wait ");
 					USART2_Transmit(OneTimeRunFunFlag);
 					if (OneTimeRunFunFlag==0)
 					{
@@ -958,12 +965,12 @@ void Increase_gradually_motor(void)
 	}
 	
 	// 10 revolutions with 10us delay
-	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*10; i++)
+	for (i=0; i<((uint32_t)STEPS_PER_REVOLUTIONS_32th*8); i++)
 	{
 		GPIO_WriteToPin(&Motor_Steps, HIGH);
-		_delay_us(10);
+		_delay_us(12);
 		GPIO_WriteToPin(&Motor_Steps, LOW);
-		_delay_us(10);
+		_delay_us(12);
 	}
 	
 }
@@ -974,12 +981,12 @@ void Decrease_gradually_motor(void)
 	uint32_t i = 0;
 	
 	// 10 revolutions with 10us delay
-	for (i=0; i<STEPS_PER_REVOLUTIONS_32th*10; i++)
+	for (i=0; i<((uint32_t)STEPS_PER_REVOLUTIONS_32th*8); i++)
 	{
 		GPIO_WriteToPin(&Motor_Steps, HIGH);
-		_delay_us(10);
+		_delay_us(12);
 		GPIO_WriteToPin(&Motor_Steps, LOW);
-		_delay_us(10);
+		_delay_us(12);
 	}
 	
 	// 2 revolutions with 15us delay
@@ -1010,12 +1017,12 @@ void Spin_motor(uint8_t time_in_sec)
 		uint32_t i = 0;
 		Increase_gradually_motor();
 		// in for loop 39 is number of revolutions in 5 sec at 10us delay
-		for (i=0; i<STEPS_PER_REVOLUTIONS_32th*39u*(time_in_sec/5 - 1); i++)
+		for (i=0; i<((uint32_t)STEPS_PER_REVOLUTIONS_32th*28*(time_in_sec/5 - 1)); i++)
 		{
 			GPIO_WriteToPin(&Motor_Steps, HIGH);
-			_delay_us(10);
+			_delay_us(12);
 			GPIO_WriteToPin(&Motor_Steps, LOW);
-			_delay_us(10);
+			_delay_us(12);
 		}
 		Decrease_gradually_motor();
 	}
@@ -1036,17 +1043,39 @@ void Send_Text_On_Screen(const char	*text)
 }
 
 void Blower_ON(uint16_t Blower_time_sec)
-{
-	
+{	
 	Timer1_init();
-	while( (Blower_time_sec - time_in_seconds) != 0 )
+	while( Blower_time_sec != time_in_seconds )
 		GPIO_WriteToPin(&Blower, HIGH);
 	GPIO_WriteToPin(&Blower, LOW);
 	TIMSK1 &= ~(1<<0);	// Interrupt disable
-	time_in_seconds=0;
+	TCCR1B = 0;			// Timer1 OFF
 }
 
 void Dispense_Reagent(uint8_t Quantity, GPIO_Config *pPump_Name)
 {
-	
+	;
+}
+
+void my_delay_ms(uint32_t ms)
+{
+	while (0 < ms--)
+	{
+		_delay_ms(1);
+	}
+}
+
+void Reagent_Wait_Time(uint16_t wait_Time)
+{
+	Timer1_init();
+// 	itoa(time_in_seconds, buffer, 10);
+// 	USART2_transmitstring("\ntime =");
+// 	USART2_transmitstring(buffer);
+// 	memset(buffer, '\0', PACKET_SIZE * sizeof(buffer[0]));	// rec_bufferglob clear
+	while( (wait_Time - time_in_seconds) !=0 )
+ 		_delay_ms(5);
+	TIMSK1 &= ~(1<<0);	// Timer1 Interrupt disable
+	TCCR1B = 0;			// Timer1 OFF
+	//USART2_transmitstring("here");
+	//time_in_seconds=0;
 }
