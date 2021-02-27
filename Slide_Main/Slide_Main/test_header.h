@@ -63,6 +63,7 @@
 
 #define TIME										60				// Seconds
 #define STEPS_PER_REVOLUTIONS_32th					6400			// 1/32th micro stepping
+#define STEPS_PER_REVOLUTIONS_FULL_STEP				200
 
 /* EEprom Addresses of parameter*/
 
@@ -130,6 +131,8 @@
 #define P4_REG_E_WAIT_TIME_ADD						0x5E
 
 #define SPIN_TIME_ADD								0x60
+
+#define REVOLUTIONS									4											
 
 
 typedef struct

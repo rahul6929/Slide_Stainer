@@ -34,44 +34,174 @@ int main(void)
 {
 	//uint8_t OneTimeRunFunFlag=0;
 	uint32_t counting = 0;
+	uint8_t ii=0;
 	
-	
-	float stepdelay;
+	uint8_t stepdelay;
 	USART2_Init(MYUBRR);
 	USART0_Init(MYUBRR);
 	GpioPinInit();
-	_delay_ms(1000);
+	_delay_ms(3000);
 	//Timer1_init();
 	USART2_transmitstring("sdjcsdb");
 	USART0_transmitstring("page Main");
 	Send_FF_to_Display();
 	if (EEPROM_Read2Bytes(P4_REG_E_WAIT_TIME_ADD)==0xFFFF)
 		EEPROM_DisplayDataInit();
-	GPIO_WriteToPin(&Motor_Dir, HIGH);
+	
 	//TIMSK1 &= ~(1<<0);	// Interrupt disable
-
+	//GPIO_WriteToPin(&Motor_Dir, LOW);
+	//uint8_t times_us[16]={30,20,15,14,13,12,11};
 	sei();		// To enable Global Interrupt, cli(); for disable
+	
 	/*
 	while(1)
-	{
-		GPIO_WriteToPin(&Motor_Dir, HIGH);
-		for(counting =0; counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*10); counting++)
-		{
-		GPIO_WriteToPin(&Motor_Steps, HIGH);
-		_delay_us(13);
-		GPIO_WriteToPin(&Motor_Steps, LOW);
-		_delay_us(13);
-		}
-		_delay_ms(1500);
-		GPIO_WriteToPin(&Motor_Dir, LOW);
-		for(counting =0; counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*10); counting++)
+	{	
+		Spin_motor(10);
+		
+		stepdelay = 30;
+		//USART2_transmitstring("\n30");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*1) ; counting++)
 		{
 			GPIO_WriteToPin(&Motor_Steps, HIGH);
-			_delay_us(13);
+			my_delay_us(stepdelay);
 			GPIO_WriteToPin(&Motor_Steps, LOW);
-			_delay_us(13);
+			my_delay_us(stepdelay);
 		}
-		_delay_ms(1500);
+		stepdelay = 20;
+		//USART2_transmitstring("\n20");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*2) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		stepdelay = 15;
+		//USART2_transmitstring("\n15");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		//
+		stepdelay = 14;
+		//USART2_transmitstring("\n14");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		stepdelay = 13;
+		//USART2_transmitstring("\n15");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		stepdelay = 12;
+		//USART2_transmitstring("\n12");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		stepdelay = 11;
+		//USART2_transmitstring("\n11");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		stepdelay = 10;
+		//USART2_transmitstring("\n11");
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+	}stepdelay = 9;
+	//USART2_transmitstring("\n11");
+	for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		my_delay_us(stepdelay);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		my_delay_us(stepdelay);
+	}
+	stepdelay = 8;
+	//USART2_transmitstring("\n11");
+	for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		my_delay_us(stepdelay);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		my_delay_us(stepdelay);
+	}
+	stepdelay = 7;
+	//USART2_transmitstring("\n11");
+	for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+	{
+		GPIO_WriteToPin(&Motor_Steps, HIGH);
+		my_delay_us(stepdelay);
+		GPIO_WriteToPin(&Motor_Steps, LOW);
+		my_delay_us(stepdelay);
+}stepdelay = 6;
+//USART2_transmitstring("\n11");
+for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*30) ; counting++)
+{
+	GPIO_WriteToPin(&Motor_Steps, HIGH);
+	my_delay_us(stepdelay);
+	GPIO_WriteToPin(&Motor_Steps, LOW);
+	my_delay_us(stepdelay);
+}
+stepdelay = 8;
+//USART2_transmitstring("\n11");
+for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*10) ; counting++)
+{
+	GPIO_WriteToPin(&Motor_Steps, HIGH);
+	my_delay_us(stepdelay);
+	GPIO_WriteToPin(&Motor_Steps, LOW);
+	my_delay_us(stepdelay);
+}stepdelay = 11;
+//USART2_transmitstring("\n11");
+for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*10) ; counting++)
+{
+	GPIO_WriteToPin(&Motor_Steps, HIGH);
+	my_delay_us(stepdelay);
+	GPIO_WriteToPin(&Motor_Steps, LOW);
+	my_delay_us(stepdelay);
+}
+stepdelay = 12;
+//USART2_transmitstring("\n12");
+for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+{
+	GPIO_WriteToPin(&Motor_Steps, HIGH);
+	my_delay_us(stepdelay);
+	GPIO_WriteToPin(&Motor_Steps, LOW);
+	my_delay_us(stepdelay);
+}
+stepdelay = 13;
+		for (counting=1;  counting < ((uint32_t)STEPS_PER_REVOLUTIONS_32th*3) ; counting++)
+		{
+			GPIO_WriteToPin(&Motor_Steps, HIGH);
+			my_delay_us(stepdelay);
+			GPIO_WriteToPin(&Motor_Steps, LOW);
+			my_delay_us(stepdelay);
+		}
+		
+		_delay_ms(2000);
+		
 	} */
 	
 /////////////////////////////////////////////////////////  SUPER LOOP START  ////////////////////////////////////////////////////////////////////////////////	
@@ -104,30 +234,38 @@ int main(void)
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_START_BLOWER_TIME_ADD));
 										
 										Send_Text_On_Screen("Cycle 1 In Progress...");											
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_A_QTY_ADD), &Reagent_A_pump);				
+										//Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_A_QTY_ADD), &Reagent_A_pump);				
 										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_A_WAIT_TIME_ADD));
-										//Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));
+										Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));
 										
 										Send_Text_On_Screen("Cycle 2 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_B_QTY_ADD), &Reagent_B_pump);
+										//Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_B_QTY_ADD), &Reagent_B_pump);
+										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_B_WAIT_TIME_ADD));
+										Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));
 										
 										Send_Text_On_Screen("Cycle 3 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_C_QTY_ADD), &Reagent_C_pump);
-										
+										//Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_C_QTY_ADD), &Reagent_C_pump);
+										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_C_WAIT_TIME_ADD));
+										Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));
 										
 										Send_Text_On_Screen("Cycle 4 In Progress...");
-										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_D_QTY_ADD), &Reagent_D_pump);
+										//Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_D_QTY_ADD), &Reagent_D_pump);
+										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_D_WAIT_TIME_ADD));
+										Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD)); 
 										 										
  										Send_Text_On_Screen("Cycle 5 In Progress...");
- 										Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_E_QTY_ADD), &Reagent_E_pump); 
-																			
+ 										//Dispense_Reagent(EEPROM_Read2Bytes(P1_REG_E_QTY_ADD), &Reagent_E_pump); 
+										Reagent_Wait_Time(EEPROM_Read2Bytes(P1_REG_E_WAIT_TIME_ADD));
+										Spin_motor(EEPROM_Read2Bytes(SPIN_TIME_ADD));	
+																		
 										Send_Text_On_Screen("Draining Cycle In Progress...");
 										_delay_ms(1000);
 										
-										Send_Text_On_Screen("End of Program 1, remove tray.");
-											
+										Send_Text_On_Screen("Drying Cycle In Progress...");
 										Blower_ON(EEPROM_Read2Bytes(P1_REG_A_END_BLOWER_TIME_ADD));
-										_delay_ms(2000); 
+										_delay_ms(2000);
+										Send_Text_On_Screen("End of Program 1");
+										_delay_ms(2000);
 										USART0_transmitstring("page Main");
 										Send_FF_to_Display(); 
 										strcpy(rec_bufferglob, "back");
@@ -472,14 +610,8 @@ int main(void)
 				
 			case TESTBENCH:
 				{
-					GPIO_WriteToPin(&Reagent_D_pump, HIGH);
-					USART2_transmitstring("\ntestbench");
-					memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear
 					while(1)
 					{
-						USART2_transmitstring("\nrecbuff = ");
-						USART2_transmitstring(rec_bufferglob);
-						_delay_ms(200);
 						if (!strcmp(rec_bufferglob, "motorA_ON"))
 							GPIO_WriteToPin(&Reagent_A_pump, HIGH);
 						if (!strcmp(rec_bufferglob, "motorA_OFF"))
@@ -519,8 +651,11 @@ int main(void)
 							GPIO_WriteToPin(&Blower, HIGH);
 						if (!strcmp(rec_bufferglob, "BLOWER_OFF"))
 							GPIO_WriteToPin(&Blower, LOW);
-					
-					
+						
+						if (!strcmp(rec_bufferglob, "STEPPER_ON"))
+							Spin_motor(15);
+						
+						
 						if (MatchCommand(rec_bufferglob)==BACK)
 						{
 							memset(rec_bufferglob, '\0', PACKET_SIZE * sizeof(rec_bufferglob[0]));	// rec_bufferglob clear

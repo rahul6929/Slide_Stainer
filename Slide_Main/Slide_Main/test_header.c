@@ -1102,9 +1102,9 @@ void Spin_motor(uint8_t time_in_sec)
 		for (i=0; i<((uint32_t)STEPS_PER_REVOLUTIONS_32th*28*(time_in_sec/5 - 1)); i++)
 		{
 			GPIO_WriteToPin(&Motor_Steps, HIGH);
-			_delay_us(12);
+			_delay_us(8);
 			GPIO_WriteToPin(&Motor_Steps, LOW);
-			_delay_us(12);
+			_delay_us(8);
 		}
 		Decrease_gradually_motor();
 	}
@@ -1136,7 +1136,7 @@ void Blower_ON(uint16_t Blower_time_sec)
 
 void Dispense_Reagent(uint8_t Quantity, GPIO_Config *pPump_Name)
 {
-	;
+	
 }
 
 void my_delay_ms(uint32_t ms)
